@@ -1,11 +1,9 @@
 (defpackage :shen-test
-  (:use :cl)
+  (:use :cl :shen.misc)
   (:export :test))
-
 (in-package :shen-test)
 
 (defun test ()
   (shen.install:prelude)
-  (let ((*package* (find-package :shen))
-        (sb-ext:*muffled-warnings* t))
+  (with-shen ()
     (shen::|load| "testsuite.shen")))

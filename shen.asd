@@ -3,7 +3,7 @@
   :components ((:file "package")
                (:file "primitives")
                (:file "backend")
-               (:file "install")))
+               (:file "prelude")))
 
 (defsystem "shen-test"
   :depends-on (:shen)

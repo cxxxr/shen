@@ -1,4 +1,4 @@
-(in-package :shen.install)
+(in-package :shen.prelude)
 
 (defvar shen::|*language*| "Common Lisp")
 (defvar shen::|*port*| 2.1)
@@ -34,13 +34,17 @@
 
 (defvar *native-path* (merge-pathnames "native/" (asdf:system-source-directory :shen)))
 
-(defun shen-get ()
+(defun install ()
+  (fetch-source)
+  (build))
+
+(defun fetch-source ()
   (uiop:run-program (format nil "wget '~A/~A/~A'" *url-root* *release-name* *file-name*))
   (uiop:run-program (format nil "tar xf ~A" *file-name*))
   (uiop:run-program (format nil "rm -f ~A" *file-name*))
   (uiop:run-program (format nil "mv ~A kernel" *nested-folder-name*)))
 
-(defun shen-compile ()
+(defun buildshen-compile ()
   (dolist (file *shen-files*)
     (compile-kl file)))
 
@@ -84,16 +88,12 @@
       (format out "~S~%~%" x))))
 
 
-(defun load-file (pathname)
-  (let ((*readtable* shen.readtable:*shen-readtable*)
-        (*package* (find-package :shen))
-        (sb-ext:*muffled-warnings* t))
-    (load pathname)))
-
-(defun load-shen-files ()
-  (dolist (name *shen-files*)
-    (let ((pathname (make-pathname :name name :type "lisp" :defaults *native-path*)))
-      (load-file pathname))))
+(defun init ()
+  (load-shen-files)
+  (load-file (make-pathname :name "overwrite"
+                            :type "lisp"
+                            :defaults (asdf:system-source-directory :shen)))
+  (load-platform))
 
 (defun load-platform ()
   (let ((*readtable* shen.readtable:*shen-readtable*)
@@ -103,9 +103,20 @@
                       (merge-pathnames "platform.shen"
                                        (asdf:system-source-directory :shen)))))
 
-(defun prelude ()
-  (load-shen-files)
-  (load-file (make-pathname :name "overwrite"
-                            :type "lisp"
-                            :defaults (asdf:system-source-directory :shen)))
-  (load-platform))
+(defun load-shen-files ()
+  (dolist (name *shen-files*)
+    (let ((pathname (make-pathname :name name :type "lisp" :defaults *native-path*)))
+      (load-file pathname))))
+
+(defun load-file (pathname)
+  (let ((*readtable* shen.readtable:*shen-readtable*)
+        (*package* (find-package :shen))
+        (sb-ext:*muffled-warnings* t))
+    (load pathname)))
+
+
+(defmacro with-shen (() &body body)
+  `(let ((*package* (find-package :shen))
+         (*readtable* shen.readtable:*shen-readtable*)
+         (sb-ext:*muffled-warnings* t))
+     ,@body))

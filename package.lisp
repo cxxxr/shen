@@ -1,13 +1,15 @@
 (defpackage :shen
   (:use :cl))
 
-(defpackage :shen.install
-  (:use :cl)
-  (:export :prelude))
-
 (defpackage :shen.readtable
   (:use :cl)
   (:export :*shen-readtable*))
+
+(defpackage :shen.prelude
+  (:use :cl)
+  (:export :install
+           :init
+           :with-shen))
 
 
 (in-package :shen.readtable)
