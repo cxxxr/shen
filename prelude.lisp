@@ -44,7 +44,7 @@
   (uiop:run-program (format nil "rm -f ~A" *file-name*))
   (uiop:run-program (format nil "mv ~A kernel" *nested-folder-name*)))
 
-(defun buildshen-compile ()
+(defun build ()
   (dolist (file *shen-files*)
     (compile-kl file)))
 
