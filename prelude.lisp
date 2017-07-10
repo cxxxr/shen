@@ -89,11 +89,14 @@
 
 
 (defun init ()
-  (load-shen-files)
-  (load-file (make-pathname :name "overwrite"
-                            :type "lisp"
-                            :defaults (asdf:system-source-directory :shen)))
-  (load-platform))
+  (locally (declare (optimize (speed 3) (safety 3) (debug 0)))
+    (handler-bind ((warning #'muffle-warning))
+      (let ((sb-ext:*muffled-warnings* t))
+        (load-shen-files)
+        (load-file (make-pathname :name "overwrite"
+                                  :type "lisp"
+                                  :defaults (asdf:system-source-directory :shen)))
+        (load-platform)))))
 
 (defun load-platform ()
   (let ((*readtable* shen.readtable:*shen-readtable*)
