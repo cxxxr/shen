@@ -91,7 +91,7 @@
 (defun init ()
   (locally (declare (optimize (speed 3) (safety 3) (debug 0)))
     (handler-bind ((warning #'muffle-warning))
-      (let ((sb-ext:*muffled-warnings* t))
+      (let (#+sbcl(sb-ext:*muffled-warnings* t))
         (load-shen-files)
         (load-file (make-pathname :name "overwrite"
                                   :type "lisp"
@@ -101,7 +101,7 @@
 (defun load-platform ()
   (let ((*readtable* shen.readtable:*shen-readtable*)
         (*package* (find-package :shen))
-        (sb-ext:*muffled-warnings* t))
+        #+sbcl(sb-ext:*muffled-warnings* t))
     (uiop:symbol-call :shen '|load|
                       (merge-pathnames "platform.shen"
                                        (asdf:system-source-directory :shen)))))
@@ -114,14 +114,14 @@
 (defun load-file (pathname)
   (let ((*readtable* shen.readtable:*shen-readtable*)
         (*package* (find-package :shen))
-        (sb-ext:*muffled-warnings* t))
+        #+sbcl(sb-ext:*muffled-warnings* t))
     (load pathname)))
 
 
 (defmacro with-shen (() &body body)
   `(let ((*package* (find-package :shen))
          (*readtable* shen.readtable:*shen-readtable*)
-         (sb-ext:*muffled-warnings* t))
+         #+sbcl(sb-ext:*muffled-warnings* t))
      ,@body))
 
 (defun toplevel ()

@@ -346,14 +346,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
   #+CCL
   (HANDLER-BIND
     ((WARNING #'MUFFLE-WARNING))
-    (LET* ((Args    (CDR *COMMAND-LINE-ARGUMENT-LIST*)))
+    (LET* ((Args (UIOP:COMMAND-LINE-ARGUMENTS)))
       (SETQ *argv* Args)
       (IF (shen-cl.interpret-args Args)
         (shen.shen)
         (exit 0))))
 
   #+SBCL
-  (LET* ((Args    (CDR SB-EXT:*POSIX-ARGV*)))
+  (LET* ((Args (UIOP:COMMAND-LINE-ARGUMENTS)))
     (SETQ *argv* Args)
     (IF (shen-cl.interpret-args Args)
       (HANDLER-CASE (shen.shen)
