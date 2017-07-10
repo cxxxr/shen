@@ -1,6 +1,10 @@
 (defpackage :shen
   (:use :cl))
 
+(defpackage :shen.install
+  (:use :cl)
+  (:export))
+
 (defpackage :shen.prelude
   (:use :cl)
   (:export :prelude))
