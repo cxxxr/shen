@@ -5,7 +5,11 @@
 (defvar shen::|*porters*| "Mark Tarver")
 (defvar shen::|*implementation*| (LISP-IMPLEMENTATION-TYPE))
 (defvar shen::|*release*| (LISP-IMPLEMENTATION-VERSION))
-(defvar shen::|*os*| (OR #+WIN32 "Windows" #+LINUX "Linux" #+DARWIN "macOS" #+UNIX "Unix" "Unknown"))
+(defvar shen::|*os*| (OR #+WIN32 "Windows"
+                         #+LINUX "Linux"
+                         #+DARWIN "macOS"
+                         #+UNIX "Unix"
+                         "Unknown"))
 
 (defun load-file (pathname)
   (let ((*readtable* shen.readtable:*shen-readtable*)
@@ -37,7 +41,9 @@
   (let ((*readtable* shen.readtable:*shen-readtable*)
         (*package* (find-package :shen))
         (sb-ext:*muffled-warnings* t))
-    (uiop:symbol-call :shen '|load| "platform.shen")))
+    (uiop:symbol-call :shen '|load|
+                      (merge-pathnames "platform.shen"
+                                       (asdf:system-source-directory :shen)))))
 
 (defun prelude ()
   (let ((dir (asdf:system-source-directory :shen)))
