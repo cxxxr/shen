@@ -120,3 +120,7 @@
          (*readtable* shen.readtable:*shen-readtable*)
          (sb-ext:*muffled-warnings* t))
      ,@body))
+
+(defun toplevel ()
+  (with-shen ()
+    (shen::|shen-cl.toplevel|)))

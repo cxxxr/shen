@@ -9,7 +9,8 @@
   (:use :cl)
   (:export :install
            :init
-           :with-shen))
+           :with-shen
+           :toplevel))
 
 
 (in-package :shen.readtable)
