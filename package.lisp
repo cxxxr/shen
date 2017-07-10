@@ -3,10 +3,6 @@
 
 (defpackage :shen.install
   (:use :cl)
-  (:export))
-
-(defpackage :shen.prelude
-  (:use :cl)
   (:export :prelude))
 
 (defpackage :shen.readtable

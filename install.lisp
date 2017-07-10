@@ -1,10 +1,38 @@
 (in-package :shen.install)
 
+(defvar shen::|*language*| "Common Lisp")
+(defvar shen::|*port*| 2.1)
+(defvar shen::|*porters*| "Mark Tarver")
+(defvar shen::|*implementation*| (LISP-IMPLEMENTATION-TYPE))
+(defvar shen::|*release*| (LISP-IMPLEMENTATION-VERSION))
+(defvar shen::|*os*| (OR #+WIN32 "Windows"
+                         #+LINUX "Linux"
+                         #+DARWIN "macOS"
+                         #+UNIX "Unix"
+                         "Unknown"))
+
 (defvar *kernel-version* "20.1")
 (defvar *url-root* "https://github.com/Shen-Language/shen-sources/releases/download")
 (defvar *release-name* (format nil "shen-~A" *kernel-version*))
 (defvar *nested-folder-name* (format nil "ShenOSKernel-~A" *kernel-version*))
 (defvar *file-name* (format nil "ShenOSKernel-~A.tar.gz" *kernel-version*))
+
+(defvar *shen-files* '("toplevel"
+                       "core"
+                       "sys"
+                       "sequent"
+                       "yacc"
+                       "reader"
+                       "prolog"
+                       "track"
+                       "load"
+                       "writer"
+                       "macros"
+                       "declarations"
+                       "types"
+                       "t-star"))
+
+(defvar *native-path* (merge-pathnames "native/" (asdf:system-source-directory :shen)))
 
 (defun shen-get ()
   (uiop:run-program (format nil "wget '~A/~A/~A'" *url-root* *release-name* *file-name*))
@@ -13,26 +41,13 @@
   (uiop:run-program (format nil "mv ~A kernel" *nested-folder-name*)))
 
 (defun shen-compile ()
-  (compile-kl "toplevel")
-  (compile-kl "core")
-  (compile-kl "sys")
-  (compile-kl "sequent")
-  (compile-kl "yacc")
-  (compile-kl "reader")
-  (compile-kl "prolog")
-  (compile-kl "track")
-  (compile-kl "load")
-  (compile-kl "writer")
-  (compile-kl "macros")
-  (compile-kl "declarations")
-  (compile-kl "types")
-  (compile-kl "t-star"))
+  (dolist (file *shen-files*)
+    (compile-kl file)))
 
 (defun compile-kl (file)
   (let ((kl-file (merge-pathnames (format nil "kernel/klambda/~A.kl" file)
                                   (asdf:system-source-directory :shen)))
-        (lisp-file (merge-pathnames (format nil "SHEN/~A.lisp" file)
-                                    (asdf:system-source-directory :shen))))
+        (lisp-file (merge-pathnames (format nil "~A.lisp" file) *native-path*)))
     (ensure-directories-exist lisp-file)
     (let ((*readtable* shen.readtable:*shen-readtable*)
           (*package* (find-package :shen)))
@@ -67,3 +82,30 @@
     (terpri out)
     (dolist (x code)
       (format out "~S~%~%" x))))
+
+
+(defun load-file (pathname)
+  (let ((*readtable* shen.readtable:*shen-readtable*)
+        (*package* (find-package :shen))
+        (sb-ext:*muffled-warnings* t))
+    (load pathname)))
+
+(defun load-shen-files ()
+  (dolist (name *shen-files*)
+    (let ((pathname (make-pathname :name name :type "lisp" :defaults *native-path*)))
+      (load-file pathname))))
+
+(defun load-platform ()
+  (let ((*readtable* shen.readtable:*shen-readtable*)
+        (*package* (find-package :shen))
+        (sb-ext:*muffled-warnings* t))
+    (uiop:symbol-call :shen '|load|
+                      (merge-pathnames "platform.shen"
+                                       (asdf:system-source-directory :shen)))))
+
+(defun prelude ()
+  (load-shen-files)
+  (load-file (make-pathname :name "overwrite"
+                            :type "lisp"
+                            :defaults (asdf:system-source-directory :shen)))
+  (load-platform))

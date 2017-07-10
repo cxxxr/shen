@@ -2,5 +2,4 @@
   :components ((:file "package")
                (:file "primitives")
                (:file "backend")
-               (:file "install")
-               (:file "prelude")))
+               (:file "install")))
