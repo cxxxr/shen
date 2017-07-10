@@ -100,20 +100,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."
 (DEFUN thaw (F)
   (FUNCALL F))
 
-#+CLISP
 (DEFUN exit (Code)
-  (EXT:EXIT Code))
-
-#+(AND CCL (NOT WINDOWS))
-(DEFUN exit (Code)
-  (CCL:QUIT Code))
-
-#+(AND CCL WINDOWS)
-(CCL::EVAL (CCL::READ-FROM-STRING "(DEFUN exit (Code) (#__exit Code))"))
-
-#+SBCL
-(DEFUN exit (Code)
-  (ALIEN-FUNCALL (EXTERN-ALIEN "exit" (FUNCTION VOID INT)) Code))
+  (UIOP:QUIT Code))
 
 #+(OR CCL SBCL)
 (DEFUN read-char-code (S)
